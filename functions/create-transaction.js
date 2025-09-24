@@ -17,20 +17,27 @@ exports.handler = async function(event) {
       return { statusCode: 500, body: JSON.stringify({ error: 'Chave não configurada' }) };
     }
 
-    const payload = {
-      external_id: body.external_id || `pedido_${Date.now()}`,
-      total_amount,
-      payment_method: "PIX",
-      items: [{
-        id: "item1",
-        title: "Doação",
-        description: "Doação via site",
-        price: total_amount,
-        quantity: 1,
-        is_physical: false
-      }],
-      customer: body.customer || { name: "Anônimo", email: "" }
-    };
+const payload = {
+  external_id: body.external_id || `pedido_${Date.now()}`,
+  total_amount,
+  payment_method: "PIX",
+  items: [{
+    id: "item1",
+    title: "Doação",
+    description: "Doação via site",
+    price: total_amount,
+    quantity: 1,
+    is_physical: false
+  }],
+  customer: {
+    name: body.customer?.name || "Usuário Teste",
+    email: body.customer?.email || "teste@exemplo.com",
+    document_type: body.customer?.document_type || "CPF",
+    document: body.customer?.document || "12345678900"
+  },
+  webhook_url: "https://juntoscomasofia.site/webhook", // pode usar a sua função viperpay-webhook
+  ip: "127.0.0.1"
+};
 
     const resp = await fetch("https://api.viperpay.org/v1/transactions", {
       method: "POST",
@@ -57,3 +64,4 @@ exports.handler = async function(event) {
     };
   }
 };
+
