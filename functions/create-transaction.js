@@ -1,4 +1,4 @@
-// netlify/functions/create-transaction.js
+// functions/create-transaction.js
 
 exports.handler = async function(event) {
   if (event.httpMethod !== 'POST') {
@@ -48,3 +48,12 @@ exports.handler = async function(event) {
       body: JSON.stringify(data)
     };
   } catch (err) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        error: "Erro no servidor",
+        details: err.message
+      })
+    };
+  }
+};
