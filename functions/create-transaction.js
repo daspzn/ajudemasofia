@@ -17,27 +17,27 @@ exports.handler = async function(event) {
       return { statusCode: 500, body: JSON.stringify({ error: 'Chave não configurada' }) };
     }
 
-const payload = {
-  external_id: body.external_id || `pedido_${Date.now()}`,
-  total_amount,
-  payment_method: "PIX",
-  items: [{
-    id: "item1",
-    title: "Doação",
-    description: "Doação via site",
-    price: total_amount,
-    quantity: 1,
-    is_physical: false
-  }],
-  customer: {
-    name: body.customer?.name || "Usuário Teste",
-    email: body.customer?.email || "teste@exemplo.com",
-    document_type: body.customer?.document_type || "CPF",
-    document: body.customer?.document || "01746838396"
-  },
-  webhook_url: "https://juntoscomasofia.site/webhook", // pode usar a sua função viperpay-webhook
-  ip: "127.0.0.1"
-};
+    const payload = {
+      external_id: body.external_id || `pedido_${Date.now()}`,
+      total_amount,
+      payment_method: "PIX",
+      items: [{
+        id: "item1",
+        title: "Doação",
+        description: "Doação via site",
+        price: total_amount,
+        quantity: 1,
+        is_physical: false
+      }],
+      customer: {
+        name: body.customer?.name || "Usuário Teste",
+        email: body.customer?.email || "teste@exemplo.com",
+        document_type: body.customer?.document_type || "CPF",
+        document: body.customer?.document?.replace(/\D/g, '') || "11144477735" // CPF válido de teste
+      },
+      webhook_url: "https://juntoscomasofia.site/webhook",
+      ip: "127.0.0.1"
+    };
 
     const resp = await fetch("https://api.viperpay.org/v1/transactions", {
       method: "POST",
@@ -64,5 +64,3 @@ const payload = {
     };
   }
 };
-
-
