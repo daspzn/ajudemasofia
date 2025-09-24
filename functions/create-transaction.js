@@ -33,7 +33,7 @@ const payload = {
     name: body.customer?.name || "Usuário Teste",
     email: body.customer?.email || "teste@exemplo.com",
     document_type: body.customer?.document_type || "CPF",
-    document: body.customer?.document || "12345678900"
+    document: body.customer?.document || "01746838396"
   },
   webhook_url: "https://juntoscomasofia.site/webhook", // pode usar a sua função viperpay-webhook
   ip: "127.0.0.1"
@@ -64,4 +64,5 @@ const payload = {
     };
   }
 };
+
 
