@@ -820,9 +820,7 @@ function interceptarClicks() {
 // Gerar PIX chamando sua função do backend
 async function gerarPix(valor) {
   showPixModal();
-  // mostrar loading
   document.getElementById('pixLoading').style.display = 'block';
-  // esconder resultado anterior
   document.getElementById('pixQr').style.display = 'none';
   document.getElementById('pixCopyBtn').style.display = 'none';
   document.getElementById('pixErrorMsg').style.display = 'none';
@@ -831,15 +829,23 @@ async function gerarPix(valor) {
     const resp = await fetch('/.netlify/functions/create-viper-transaction', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ total_amount: valor, customer: { name: "", email: "" } })
+      body: JSON.stringify({ total_amount: valor })
     });
-    const data = await resp.json();
-    // console.log('Resposta PIX:', data);
 
-    // esconder loading
+    // 🔹 checa se realmente vem JSON
+    let data = null;
+    const text = await resp.text();
+    try {
+      data = JSON.parse(text);
+    } catch (err) {
+      document.getElementById('pixErrorMsg').style.display = 'block';
+      document.getElementById('pixErrorMsg').innerText =
+        'Aguardando resposta segura da API...';
+      return;
+    }
+
     document.getElementById('pixLoading').style.display = 'none';
 
-    // obter payload e QR da resposta da ViperPay
     const payload = data.qr_code?.emv || data.qr_code || '';
     const qr_url = data.qr_code?.image_url || data.qr_code_url || '';
 
@@ -848,27 +854,17 @@ async function gerarPix(valor) {
       document.getElementById('pixQr').src = qr_url;
       document.getElementById('pixQr').style.display = 'block';
       document.getElementById('pixCopyBtn').style.display = 'inline-block';
-
     } else {
       document.getElementById('pixErrorMsg').style.display = 'block';
-      document.getElementById('pixErrorMsg').innerText = 'Não foi possível gerar PIX. Tente novamente.';
+      document.getElementById('pixErrorMsg').innerText =
+        'Ainda processando, pode levar alguns segundos...';
     }
-
   } catch (err) {
-    console.error(err);
     document.getElementById('pixLoading').style.display = 'none';
     document.getElementById('pixErrorMsg').style.display = 'block';
-    document.getElementById('pixErrorMsg').innerText = 'Erro ao gerar PIX: ' + err.message;
+    document.getElementById('pixErrorMsg').innerText = 'Erro: ' + err.message;
   }
 }
-
-// eventos
-document.addEventListener('DOMContentLoaded', function() {
-  interceptarClicks();
-
-  document.getElementById('pixModalClose').addEventListener('click', closePixModal);
-  document.getElementById('pixCopyBtn').addEventListener('click', copyPixCode);
-});
 </script>
 <!-- ============== FIM Modal PIX ============== -->
 
